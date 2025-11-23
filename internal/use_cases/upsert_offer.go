@@ -3,7 +3,7 @@ package use_cases
 import (
 	"github.com/Drinnn/eligible-offers-api/internal/dtos"
 	"github.com/Drinnn/eligible-offers-api/internal/entities"
-	httpErrors "github.com/Drinnn/eligible-offers-api/internal/errors"
+	customErrors "github.com/Drinnn/eligible-offers-api/internal/errors"
 	"github.com/Drinnn/eligible-offers-api/internal/repositories"
 )
 
@@ -19,13 +19,13 @@ func NewUpsertOfferUseCase(offerRepository repositories.OfferRepository) *Upsert
 
 func (u *UpsertOfferUseCase) Execute(request *dtos.UpsertOfferRequest) (*entities.Offer, error) {
 	if !request.StartsAt.Before(request.EndsAt) {
-		return nil, httpErrors.NewBadRequestError("starts_at must be before ends_at", nil)
+		return nil, customErrors.NewBadRequestError("starts_at must be before ends_at", nil)
 	}
 
 	offer := entities.NewOffer(request.ID, request.MerchantID, request.MCCWhitelist, request.Active, request.MinTxnCount, request.LookbackDays, request.StartsAt, request.EndsAt)
 
 	if err := u.offerRepository.Upsert(offer); err != nil {
-		return nil, err
+		return nil, customErrors.NewServiceError("failed to upsert offer")
 	}
 
 	return offer, nil

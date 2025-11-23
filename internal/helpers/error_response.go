@@ -1,9 +1,6 @@
 package helpers
 
 import (
-	"encoding/json"
-	"net/http"
-
 	"github.com/go-playground/validator/v10"
 )
 
@@ -37,10 +34,4 @@ func getErrorMessage(e validator.FieldError) string {
 	default:
 		return e.Field() + " is invalid"
 	}
-}
-
-func WriteJSONError(w http.ResponseWriter, statusCode int, errorResponse ErrorResponse) {
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(statusCode)
-	json.NewEncoder(w).Encode(errorResponse)
 }
