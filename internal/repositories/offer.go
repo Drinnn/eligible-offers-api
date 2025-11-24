@@ -8,6 +8,7 @@ import (
 
 type OfferRepository interface {
 	Upsert(offer *entities.Offer) error
+	GetAll() ([]*entities.Offer, error)
 }
 
 type InMemoryOfferRepository struct {
@@ -28,4 +29,15 @@ func (r *InMemoryOfferRepository) Upsert(offer *entities.Offer) error {
 	r.offers[offer.ID] = offer
 
 	return nil
+}
+
+func (r *InMemoryOfferRepository) GetAll() ([]*entities.Offer, error) {
+	r.mu.RLock()
+	defer r.mu.RUnlock()
+
+	allOffers := make([]*entities.Offer, 0)
+	for _, offer := range r.offers {
+		allOffers = append(allOffers, offer)
+	}
+	return allOffers, nil
 }

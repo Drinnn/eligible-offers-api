@@ -8,6 +8,7 @@ import (
 
 type TransactionRepository interface {
 	Insert(transactions []*entities.Transaction) (int, error)
+	GetByUserID(userID string) ([]*entities.Transaction, error)
 }
 
 type InMemoryTransactionRepository struct {
@@ -34,4 +35,17 @@ func (r *InMemoryTransactionRepository) Insert(transactions []*entities.Transact
 	}
 
 	return inserted, nil
+}
+
+func (r *InMemoryTransactionRepository) GetByUserID(userID string) ([]*entities.Transaction, error) {
+	r.mu.RLock()
+	defer r.mu.RUnlock()
+
+	transactions := make([]*entities.Transaction, 0, len(r.transactions))
+	for _, transaction := range r.transactions {
+		if transaction.UserID == userID {
+			transactions = append(transactions, transaction)
+		}
+	}
+	return transactions, nil
 }
